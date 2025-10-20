@@ -5,16 +5,15 @@ export default function App() {
   const [fishes, setFishes] = useState([]);
   const [newFish, setNewFish] = useState({ name: "", price: "" });
   const listRef = useRef(null);
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
-  const API_URL = "http://localhost:5000"; // Change if hosted elsewhere
 
-  // Fetch fishes from backend
+  // Fetch fishes
   const fetchFishes = async () => {
     try {
       const res = await fetch(`${API_URL}/fishes`);
       const data = await res.json();
-      // Add 'selected' flag for UI
-      setFishes(data.map((f) => ({ ...f, selected: true })));
+      setFishes(data.map(f => ({ ...f, selected: true })));
     } catch (err) {
       console.error("Failed to fetch fishes:", err);
     }
@@ -33,6 +32,13 @@ export default function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: newFish.name, price: Number(newFish.price) }),
       });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        console.error("Backend error:", errData);
+        return;
+      }
+
       const addedFish = await res.json();
       setFishes([...fishes, { ...addedFish, selected: true }]);
       setNewFish({ name: "", price: "" });
@@ -42,12 +48,13 @@ export default function App() {
   };
 
   // Toggle selection
-  const toggleSelect = (id) =>
-    setFishes((prev) => prev.map((f) => (f.id === id ? { ...f, selected: !f.selected } : f)));
+  const toggleSelect = id =>
+    setFishes(prev => prev.map(f => (f.id === id ? { ...f, selected: !f.selected } : f)));
 
   // Update price
   const updatePrice = async (id, price) => {
-    setFishes((prev) => prev.map((f) => (f.id === id ? { ...f, price: Number(price) } : f)));
+    if (!id || price === "") return;
+    setFishes(prev => prev.map(f => (f.id === id ? { ...f, price: Number(price) } : f)));
     try {
       await fetch(`${API_URL}/fishes/${id}/price`, {
         method: "POST",
@@ -59,7 +66,7 @@ export default function App() {
     }
   };
 
-  // Share to WhatsApp or download
+  // Share image
   const shareToWhatsApp = async () => {
     if (!listRef.current) return;
 
@@ -69,7 +76,11 @@ export default function App() {
 
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
-        await navigator.share({ files: [file], title: "Today's Fish Prices 🐟", text: "Fresh catch for today!" });
+        await navigator.share({
+          files: [file],
+          title: "Today's Fish Prices 🐟",
+          text: "Fresh catch for today!",
+        });
       } catch (err) {
         console.error("Share canceled or failed", err);
       }
@@ -93,14 +104,14 @@ export default function App() {
           placeholder="Fish name"
           className="border p-2 rounded w-1/2 focus:outline-none focus:ring-2 focus:ring-blue-400"
           value={newFish.name}
-          onChange={(e) => setNewFish({ ...newFish, name: e.target.value })}
+          onChange={e => setNewFish({ ...newFish, name: e.target.value })}
         />
         <input
           type="number"
           placeholder="Price ₹"
           className="border p-2 rounded w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-400"
           value={newFish.price}
-          onChange={(e) => setNewFish({ ...newFish, price: e.target.value })}
+          onChange={e => setNewFish({ ...newFish, price: e.target.value })}
         />
         <button className="bg-green-500 text-white rounded px-3 hover:bg-green-600" onClick={addFish}>
           ➕
@@ -109,12 +120,10 @@ export default function App() {
 
       {/* Fish List */}
       <div className="space-y-3">
-        {fishes.map((f) => (
+        {fishes.map(f => (
           <div
             key={f.id}
-            className={`flex items-center justify-between p-2 rounded border ${
-              f.selected ? "bg-green-100" : "bg-white"
-            }`}
+            className={`flex items-center justify-between p-2 rounded border ${f.selected ? "bg-green-100" : "bg-white"}`}
           >
             <div>
               <p className="font-semibold text-gray-800">{f.name}</p>
@@ -124,8 +133,8 @@ export default function App() {
               <input
                 type="number"
                 className="border rounded w-20 p-1 focus:outline-none focus:ring-1 focus:ring-blue-400"
-                value={f.price}
-                onChange={(e) => updatePrice(f.id, e.target.value)}
+                value={f.price ?? ""}
+                onChange={e => updatePrice(f.id, e.target.value)}
               />
               <button
                 className="bg-blue-500 text-white px-2 rounded hover:bg-blue-600"
@@ -138,7 +147,7 @@ export default function App() {
         ))}
       </div>
 
-      {/* Poster / Shareable card */}
+      {/* Shareable Poster */}
       <div
         ref={listRef}
         className="mt-6 bg-gradient-to-b from-blue-100 to-white p-4 rounded-3xl shadow-xl border border-blue-300 text-center"
@@ -149,19 +158,14 @@ export default function App() {
           <h2 className="text-xl font-bold">Today's Fish List</h2>
         </div>
 
-        {fishes.filter((f) => f.selected).length === 0 ? (
+        {fishes.filter(f => f.selected).length === 0 ? (
           <p className="text-gray-500 italic">No fish selected</p>
         ) : (
           <div className="space-y-2">
             {fishes
-              .filter((f) => f.selected)
+              .filter(f => f.selected)
               .map((f, idx) => (
-                <div
-                  key={f.id}
-                  className={`flex justify-between p-2 rounded-lg ${
-                    idx % 2 === 0 ? "bg-blue-50" : "bg-white"
-                  } shadow-sm`}
-                >
+                <div key={f.id} className={`flex justify-between p-2 rounded-lg ${idx % 2 === 0 ? "bg-blue-50" : "bg-white"} shadow-sm`}>
                   <span className="font-semibold text-gray-800">{f.name}</span>
                   <span className="font-medium text-gray-700">₹{f.price}/kg</span>
                 </div>

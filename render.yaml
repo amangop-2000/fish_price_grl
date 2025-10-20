@@ -1,4 +1,5 @@
 services:
+  # ---------------- BACKEND ----------------
   - type: web
     name: fish-price-backend
     env: node
@@ -6,12 +7,18 @@ services:
     buildCommand: "cd backend && npm install"
     startCommand: "cd backend && npm start"
     envVars:
+      # PostgreSQL connection string (replace with your actual Render DB URL)
       - key: DATABASE_URL
-        value: "postgresql://fishprice_user:KeoV83RYFeiSuRn4v751rNqnTjmSqECc@dpg-d3nn6cjuibrs738ia8cg-a/fishprice"
+        value: "postgresql://fishprice_user:YOUR_DB_PASSWORD@YOUR_DB_HOST/fishprice"
 
+  # ---------------- FRONTEND ----------------
   - type: web
     name: fish-price-frontend
     env: static
     branch: main
     buildCommand: "npm install && npm run build"
-    staticPublishPath: "build"
+    staticPublishPath: "dist" # Vite outputs to 'dist'
+    envVars:
+      # Point frontend to backend URL (replace with actual backend URL after deployment)
+      - key: REACT_APP_API_URL
+        value: "https://fish-price-backend.onrender.com"
