@@ -258,19 +258,24 @@ export default function App() {
 
       {/* Poster */}
       <div
-        ref={listRef}
-        className="mt-6 bg-gradient-to-b from-blue-100 to-white p-4 rounded-3xl shadow-xl border border-blue-300 text-center"
-        style={{ width: "100%", maxWidth: 400 }}
+      ref={listRef}
+      className="mt-6 bg-gradient-to-b from-blue-100 to-white p-4 rounded-3xl shadow-xl border border-blue-300 text-center"
+      style={{ width: "100%", maxWidth: 400 }}
       >
-        <h1 className="text-2xl font-extrabold text-blue-800 mb-4">
-          GRL Fish & Kerala Store
-        </h1>
+      {/* Store Heading */}
+      <div className="text-center mb-4 leading-tight">
+        <h1 className="text-2xl font-extrabold text-blue-800">GRL Fish & Kerala Store</h1>
+        <p className="text-[13px] text-gray-700 font-semibold -mt-1">
+          📞 Home Delivery: <span className="text-green-700">7306698782</span>
+        </p>
+      </div>
 
-        {/* Fish Section */}
-        <div className="flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-2xl mb-4 shadow-md">
-          <span className="text-2xl">🐠</span>
-          <h2 className="text-xl font-bold">Today's Fish List</h2>
-        </div>
+      {/* Today's Fish List Title */}
+      <div className="flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-2xl mb-4 shadow-md">
+        <span className="text-2xl">🐠</span>
+        <h2 className="text-xl font-bold">Today's Fish List</h2>
+      </div>
+
 
         {fishes.filter(f => f.selected).map((f, idx) => (
           <div
