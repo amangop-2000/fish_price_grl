@@ -21,4 +21,4 @@ services:
     envVars:
       # Point frontend to backend URL (replace with actual backend URL after deployment)
       - key: REACT_APP_API_URL
-        value: "https://fish-price-backend.onrender.com"
+        value: "https://fish-price-grl-1.onrender.com"
