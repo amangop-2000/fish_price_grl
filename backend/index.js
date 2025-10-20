@@ -16,7 +16,7 @@ const pool = new Pool({
     : { rejectUnauthorized: false },
 });
 
-// ---------------- ROUTES ---------------- //
+// ---------------- FISH ROUTES ---------------- //
 
 // Get all fishes
 app.get("/fishes", async (req, res) => {
@@ -24,7 +24,7 @@ app.get("/fishes", async (req, res) => {
     const result = await pool.query("SELECT * FROM fishes ORDER BY name ASC");
     res.json(result.rows);
   } catch (err) {
-    console.error("Backend error:", err);
+    console.error("Backend error (GET /fishes):", err);
     res.status(500).json({ error: "Database error" });
   }
 });
@@ -41,7 +41,6 @@ app.post("/fishes", async (req, res) => {
     );
 
     const fish = result.rows[0];
-
     await pool.query(
       "INSERT INTO fish_price_history (fish_id, price, updated_at) VALUES ($1, $2, NOW())",
       [fish.id, price]
@@ -49,7 +48,7 @@ app.post("/fishes", async (req, res) => {
 
     res.status(201).json(fish);
   } catch (err) {
-    console.error("Backend error:", err);
+    console.error("Backend error (POST /fishes):", err);
     res.status(500).json({ error: "Database error" });
   }
 });
@@ -64,7 +63,7 @@ app.post("/fishes/:id/price", async (req, res) => {
     await pool.query("INSERT INTO fish_price_history(fish_id, price, updated_at) VALUES($1, $2, NOW())", [id, price]);
     res.json({ success: true });
   } catch (err) {
-    console.error("Backend error:", err);
+    console.error("Backend error (POST /fishes/:id/price):", err);
     res.status(500).json({ error: "Database error" });
   }
 });
@@ -75,10 +74,64 @@ app.get("/fishes/updated_today", async (req, res) => {
     const result = await pool.query("SELECT * FROM fishes WHERE updated_at >= CURRENT_DATE ORDER BY name ASC");
     res.json(result.rows);
   } catch (err) {
-    console.error("Backend error:", err);
+    console.error("Backend error (GET /fishes/updated_today):", err);
     res.status(500).json({ error: "Database error" });
   }
 });
+
+
+// ---------------- KERALA ITEMS ROUTES ---------------- //
+
+// Get all Kerala items
+app.get("/kerala_items", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM kerala_items ORDER BY name ASC");
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Backend error (GET /kerala_items):", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+// Add new Kerala item
+app.post("/kerala_items", async (req, res) => {
+  const { name, price } = req.body;
+  if (!name || !price) return res.status(400).json({ error: "Name and price are required" });
+
+  try {
+    const result = await pool.query(
+      "INSERT INTO kerala_items (name, price, updated_at) VALUES ($1, $2, NOW()) RETURNING *",
+      [name, price]
+    );
+
+    const item = result.rows[0];
+    await pool.query(
+      "INSERT INTO kerala_item_price_history (item_id, price, updated_at) VALUES ($1, $2, NOW())",
+      [item.id, price]
+    );
+
+    res.status(201).json(item);
+  } catch (err) {
+    console.error("Backend error (POST /kerala_items):", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+// Update Kerala item price
+app.post("/kerala_items/:id/price", async (req, res) => {
+  const { id } = req.params;
+  const { price } = req.body;
+
+  try {
+    await pool.query("UPDATE kerala_items SET price = $1, updated_at = NOW() WHERE id = $2", [price, id]);
+    await pool.query("INSERT INTO kerala_item_price_history(item_id, price, updated_at) VALUES($1, $2, NOW())", [id, price]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Backend error (POST /kerala_items/:id/price):", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
 
 // ---------------- START SERVER ---------------- //
 const PORT = process.env.PORT || 3000;
