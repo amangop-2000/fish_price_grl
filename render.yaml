@@ -9,7 +9,7 @@ services:
     envVars:
       # PostgreSQL connection string (replace with your actual Render DB URL)
       - key: DATABASE_URL
-        value: "postgresql://fishprice_user:YOUR_DB_PASSWORD@YOUR_DB_HOST/fishprice"
+        value: "postgresql://fishprice_user:KeoV83RYFeiSuRn4v751rNqnTjmSqECc@dpg-d3nn6cjuibrs738ia8cg-a/fishprice"
 
   # ---------------- FRONTEND ----------------
   - type: web
