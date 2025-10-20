@@ -7,14 +7,12 @@ services:
     startCommand: "cd backend && npm start"
     envVars:
       - key: DATABASE_URL
-        value: "postgres://fishprice_user:KeoV83RYFeiSuRn4v751rNqnTjmSqECc@dpg-d3nn6cjuibrs738ia8cg-a/fishprice"
-      - key: PORT
-        value: "10000" # optional, Render assigns a port automatically if not specified
+        value: "postgresql://fishprice_user:KeoV83RYFeiSuRn4v751rNqnTjmSqECc@dpg-d3nn6cjuibrs738ia8cg-a/fishprice"
+      # Remove PORT here — Render assigns automatically
 
   - type: web
     name: fish-price-frontend
     env: static
     branch: main
     buildCommand: "npm install && npm run build"
-    startCommand: "npm run serve" # optional for SPA, depends on your setup
-    staticPublishPath: "build" # your React build folder
+    staticPublishPath: "build"
