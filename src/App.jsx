@@ -5,13 +5,19 @@ export default function App() {
   const [fishes, setFishes] = useState([]);
   const [newFish, setNewFish] = useState({ name: "", price: "" });
   const listRef = useRef(null);
-  const API_URL = process.env.REACT_APP_API_URL;
+  const API_URL = process.env.REACT_APP_API_URL; // must be set in Render env vars
 
-
-  // Fetch fishes
+  // ---------------- FETCH FISHES ---------------- //
   const fetchFishes = async () => {
     try {
       const res = await fetch(`${API_URL}/fishes`);
+
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("Backend error:", text);
+        return;
+      }
+
       const data = await res.json();
       setFishes(data.map(f => ({ ...f, selected: true })));
     } catch (err) {
@@ -23,9 +29,10 @@ export default function App() {
     fetchFishes();
   }, []);
 
-  // Add new fish
+  // ---------------- ADD NEW FISH ---------------- //
   const addFish = async () => {
     if (!newFish.name || !newFish.price) return;
+
     try {
       const res = await fetch(`${API_URL}/fishes`, {
         method: "POST",
@@ -34,8 +41,8 @@ export default function App() {
       });
 
       if (!res.ok) {
-        const errData = await res.json();
-        console.error("Backend error:", errData);
+        const text = await res.text();
+        console.error("Backend error:", text);
         return;
       }
 
@@ -47,52 +54,59 @@ export default function App() {
     }
   };
 
-  // Toggle selection
+  // ---------------- TOGGLE SELECTION ---------------- //
   const toggleSelect = id =>
     setFishes(prev => prev.map(f => (f.id === id ? { ...f, selected: !f.selected } : f)));
 
-  // Update price
+  // ---------------- UPDATE PRICE ---------------- //
   const updatePrice = async (id, price) => {
     if (!id || price === "") return;
     setFishes(prev => prev.map(f => (f.id === id ? { ...f, price: Number(price) } : f)));
+
     try {
-      await fetch(`${API_URL}/fishes/${id}/price`, {
+      const res = await fetch(`${API_URL}/fishes/${id}/price`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ price: Number(price) }),
       });
+
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("Backend error:", text);
+      }
     } catch (err) {
       console.error("Failed to update price:", err);
     }
   };
 
-  // Share image
+  // ---------------- SHARE IMAGE ---------------- //
   const shareToWhatsApp = async () => {
     if (!listRef.current) return;
 
-    const dataUrl = await htmlToImage.toPng(listRef.current, { quality: 1, pixelRatio: 2 });
-    const blob = await (await fetch(dataUrl)).blob();
-    const file = new File([blob], "fish_list.png", { type: blob.type });
+    try {
+      const dataUrl = await htmlToImage.toPng(listRef.current, { quality: 1, pixelRatio: 2 });
+      const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], "fish_list.png", { type: blob.type });
 
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
           title: "Today's Fish Prices 🐟",
           text: "Fresh catch for today!",
         });
-      } catch (err) {
-        console.error("Share canceled or failed", err);
+      } else {
+        const link = document.createElement("a");
+        link.download = "fish_list.png";
+        link.href = dataUrl;
+        link.click();
+        alert("Image downloaded! You can now share it on WhatsApp.");
       }
-    } else {
-      const link = document.createElement("a");
-      link.download = "fish_list.png";
-      link.href = dataUrl;
-      link.click();
-      alert("Image downloaded! You can now share it on WhatsApp.");
+    } catch (err) {
+      console.error("Error sharing image:", err);
     }
   };
 
+  // ---------------- RENDER ---------------- //
   return (
     <div className="max-w-md mx-auto p-4 bg-gray-50 min-h-screen">
       <h1 className="text-3xl font-bold text-center mb-6 text-blue-700">🐟 My Fish Shop</h1>
