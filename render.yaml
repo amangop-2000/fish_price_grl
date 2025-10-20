@@ -20,5 +20,5 @@ services:
     staticPublishPath: "dist" # Vite outputs to 'dist'
     envVars:
       # Point frontend to backend URL (replace with actual backend URL after deployment)
-      - key: REACT_APP_API_URL
-        value: "https://fish-price-grl-1.onrender.com"
+     - key: VITE_API_URL
+       value: "https://fish-price-grl-1.onrender.com"

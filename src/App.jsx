@@ -5,7 +5,8 @@ export default function App() {
   const [fishes, setFishes] = useState([]);
   const [newFish, setNewFish] = useState({ name: "", price: "" });
   const listRef = useRef(null);
-  const API_URL = process.env.REACT_APP_API_URL; // must be set in Render env vars
+  const API_URL = import.meta.env.VITE_API_URL;
+
 
   // ---------------- FETCH FISHES ---------------- //
   const fetchFishes = async () => {
