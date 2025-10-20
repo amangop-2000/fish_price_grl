@@ -5,7 +5,7 @@ export default function App() {
   const [fishes, setFishes] = useState([]);
   const [newFish, setNewFish] = useState({ name: "", price: "" });
   const listRef = useRef(null);
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
+  const API_URL = process.env.REACT_APP_API_URL;
 
 
   // Fetch fishes
