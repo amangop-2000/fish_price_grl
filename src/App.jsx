@@ -298,7 +298,7 @@ export default function App() {
             } shadow-sm`}
           >
             <span className="font-semibold text-gray-800">{i.name}</span>
-            <span className="font-medium text-gray-700">₹{i.price}/pkt</span>
+            <span className="font-medium text-gray-700">₹{i.price}</span>
           </div>
         ))}
 
