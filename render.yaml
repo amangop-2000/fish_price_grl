@@ -8,7 +8,6 @@ services:
     envVars:
       - key: DATABASE_URL
         value: "postgresql://fishprice_user:KeoV83RYFeiSuRn4v751rNqnTjmSqECc@dpg-d3nn6cjuibrs738ia8cg-a/fishprice"
-      # Remove PORT here — Render assigns automatically
 
   - type: web
     name: fish-price-frontend
