@@ -135,13 +135,22 @@ app.post("/kerala_items/:id/price", async (req, res) => {
 // Delete fish
 app.delete("/fishes/:id", async (req, res) => {
   try {
-    await pool.query("DELETE FROM fishes WHERE id = $1", [req.params.id]);
+    console.log("Deleting fish ID:", req.params.id);
+    const result = await pool.query("DELETE FROM fishes WHERE id = $1", [req.params.id]);
+
+    console.log("Rows affected:", result.rowCount);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "No record found" });
+    }
+
     res.json({ success: true });
   } catch (err) {
     console.error("Backend error (DELETE /fishes/:id):", err);
     res.status(500).json({ error: "Database error" });
   }
 });
+
 
 // Delete Kerala item
 app.delete("/kerala_items/:id", async (req, res) => {
