@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: fish-postgres
+    environment:
+      POSTGRES_USER: fishuser
+      POSTGRES_PASSWORD: fishpassword
+      POSTGRES_DB: fishdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    restart: unless-stopped
+
+  backend:
+   build:
+    context: ./backend
+    dockerfile: Dockerfile
+
+   container_name: fish-price-backend
+
+   environment:
+    DATABASE_URL: postgresql://fishuser:fishpassword@postgres:5432/fishdb
+    DB_SSL: "false"
+    PORT: 3000
+
+   ports:
+    - "3000:3000"
+
+   depends_on:
+    - postgres
+
+   restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fish-price-frontend
+    ports:
+      - "8085:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

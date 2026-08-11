@@ -7,7 +7,7 @@ export default function App() {
   const [keralaItems, setKeralaItems] = useState([]);
   const [newItem, setNewItem] = useState({ name: "", price: "" });
   const listRef = useRef(null);
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = "/api";
 
   // ---------------- FETCH FISHES ---------------- //
   const fetchFishes = async () => {

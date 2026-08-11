@@ -18,11 +18,10 @@ app.use(express.json());
 // PostgreSQL connection
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL.includes("localhost")
-    ? false
-    : { rejectUnauthorized: false },
+  ssl: process.env.DB_SSL === "true"
+    ? { rejectUnauthorized: false }
+    : false,
 });
-
 // ---------------- FISH ROUTES ---------------- //
 
 // Get all fishes
