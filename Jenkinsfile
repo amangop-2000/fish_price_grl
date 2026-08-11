@@ -4,7 +4,6 @@ pipeline {
 
     environment {
         AWS_REGION = 'us-east-1'
-
         AWS_ACCOUNT_ID = '864241680365'
 
         BACKEND_REPO = 'fishprice-backend'
@@ -26,49 +25,40 @@ pipeline {
 
         stage('Build Backend') {
             steps {
-                sh '''
-                    docker build \
-                    -t ${BACKEND_IMAGE}:${IMAGE_TAG} \
-                    ./backend
+                bat '''
+                    docker build -t %BACKEND_IMAGE%:%IMAGE_TAG% ./backend
                 '''
             }
         }
 
         stage('Build Frontend') {
             steps {
-                sh '''
-                    docker build \
-                    -t ${FRONTEND_IMAGE}:${IMAGE_TAG} \
-                    .
+                bat '''
+                    docker build -t %FRONTEND_IMAGE%:%IMAGE_TAG% .
                 '''
             }
         }
 
         stage('Login to ECR') {
             steps {
-                sh '''
-                    aws ecr get-login-password \
-                    --region ${AWS_REGION} | \
-                    docker login \
-                    --username AWS \
-                    --password-stdin \
-                    ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                bat '''
+                    aws ecr get-login-password --region %AWS_REGION% | docker login --username AWS --password-stdin %AWS_ACCOUNT_ID%.dkr.ecr.%AWS_REGION%.amazonaws.com
                 '''
             }
         }
 
         stage('Push Backend') {
             steps {
-                sh '''
-                    docker push ${BACKEND_IMAGE}:${IMAGE_TAG}
+                bat '''
+                    docker push %BACKEND_IMAGE%:%IMAGE_TAG%
                 '''
             }
         }
 
         stage('Push Frontend') {
             steps {
-                sh '''
-                    docker push ${FRONTEND_IMAGE}:${IMAGE_TAG}
+                bat '''
+                    docker push %FRONTEND_IMAGE%:%IMAGE_TAG%
                 '''
             }
         }
