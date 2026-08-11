@@ -43,7 +43,7 @@ pipeline {
             steps {
                 withCredentials([
                     [$class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-ecr']
+                    credentialsId: 'github-ecr-user']
                 ]) {
                     bat '''
                         aws sts get-caller-identity
