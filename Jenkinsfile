@@ -76,12 +76,19 @@ pipeline {
             steps {
                 withCredentials([
                     file(
-                        credentialsId: 'ec2-pem',
+                        credentialsId: 'ec2-ssh-key',
                         variable: 'EC2_KEY'
                     )
                 ]) {
-
                     bat '''
+                        echo Fixing SSH key permissions...
+
+                        icacls "%EC2_KEY%" /inheritance:r
+                        icacls "%EC2_KEY%" /grant:r "SYSTEM:F"
+                        icacls "%EC2_KEY%" /grant:r "Administrators:F"
+
+                        echo Deploying to EC2...
+
                         ssh -i "%EC2_KEY%" -o StrictHostKeyChecking=no ubuntu@%EC2_HOST% "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 864241680365.dkr.ecr.us-east-1.amazonaws.com && cd /home/ubuntu/fishprice && sed -i 's/^IMAGE_TAG=.*/IMAGE_TAG=%IMAGE_TAG%/' .env.deploy && docker compose pull && docker compose up -d"
                     '''
                 }
