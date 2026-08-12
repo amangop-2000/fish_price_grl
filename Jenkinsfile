@@ -76,7 +76,7 @@ pipeline {
             steps {
                 withCredentials([
                     file(
-                        credentialsId: 'ec2-ssh-key',
+                        credentialsId: 'ec2-pem',
                         variable: 'EC2_KEY'
                     )
                 ]) {
