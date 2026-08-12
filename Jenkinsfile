@@ -24,11 +24,14 @@ pipeline {
             }
         }
         stage('Test EC2 SSH') {
-            steps {
-                sshagent(['5ede2432-7fbe-44c9-88d6-e456030ae61b']) {
-                    bat '''
-                        ssh -o StrictHostKeyChecking=no ubuntu@54.167.192.77 "echo EC2 SSH connection successful && docker --version"
-                    '''
+          steps {
+            withCredentials([
+                 file(credentialsId: 'ec2-pem', variable: 'EC2_KEY')
+                ]) {
+                        bat '''
+                            echo Testing SSH connection...
+                            ssh -i "%EC2_KEY%" -o StrictHostKeyChecking=no ubuntu@54.167.192.77 "echo EC2 SSH connection successful && docker --version"
+                        '''
                 }
             }
         }
