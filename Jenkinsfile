@@ -17,9 +17,19 @@ pipeline {
 
     stages {
 
+        
         stage('Checkout') {
             steps {
                 checkout scm
+            }
+        }
+        stage('Test EC2 SSH') {
+            steps {
+                sshagent(['5ede2432-7fbe-44c9-88d6-e456030ae61b']) {
+                    bat '''
+                        ssh -o StrictHostKeyChecking=no ubuntu@54.167.192.77 "echo EC2 SSH connection successful && docker --version"
+                    '''
+                }
             }
         }
 
