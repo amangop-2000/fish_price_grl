@@ -41,7 +41,15 @@ pipeline {
                 '''
             }
         }
-
+        stage('Check AWS') {
+            steps {
+                bat '''
+                    whoami
+                    aws --version
+                    aws sts get-caller-identity
+                '''
+            }
+        }
         stage('Login to ECR') {
             steps {
                 bat '''
