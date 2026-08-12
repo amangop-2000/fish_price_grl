@@ -24,14 +24,18 @@ pipeline {
             }
         }
         stage('Test EC2 SSH') {
-          steps {
-            withCredentials([
-                 file(credentialsId: 'ec2-pem', variable: 'EC2_KEY')
+            steps {
+                withCredentials([
+                    file(credentialsId: 'ec2-pem', variable: 'EC2_KEY')
                 ]) {
-                        bat '''
-                            echo Testing SSH connection...
-                            ssh -i "%EC2_KEY%" -o StrictHostKeyChecking=no ubuntu@54.167.192.77 "echo EC2 SSH connection successful && docker --version"
-                        '''
+                    bat '''
+                        echo Testing SSH connection...
+
+                        icacls "%EC2_KEY%" /inheritance:r
+                        icacls "%EC2_KEY%" /grant:r "SYSTEM:R"
+
+                        ssh -i "%EC2_KEY%" -o StrictHostKeyChecking=no ubuntu@54.167.192.77 "echo EC2 SSH connection successful && docker --version"
+                    '''
                 }
             }
         }
