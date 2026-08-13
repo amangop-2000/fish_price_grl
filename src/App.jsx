@@ -83,35 +83,19 @@ const itemTableCellStyle = {
 
 export default function App() {
   const [fishes, setFishes] = useState([]);
-
   const [newFish, setNewFish] = useState({
     name: "",
     price: "",
   });
 
   const [keralaItems, setKeralaItems] = useState([]);
-
   const [newItem, setNewItem] = useState({
     name: "",
     price: "",
   });
 
   const [priceInputs, setPriceInputs] = useState({});
-
   const [isSharing, setIsSharing] = useState(false);
-
-  /*
-   * NEW:
-   * Stores the already-generated PNG file.
-   */
-  const [shareFile, setShareFile] = useState(null);
-
-  /*
-   * NEW:
-   * Indicates that the poster image is currently being prepared.
-   */
-  const [isPreparingShare, setIsPreparingShare] =
-    useState(false);
 
   const listRef = useRef(null);
 
@@ -144,18 +128,13 @@ export default function App() {
         const next = { ...prev };
 
         data.forEach((f) => {
-          next[`fish-${f.id}`] = String(
-            f.price ?? ""
-          );
+          next[`fish-${f.id}`] = String(f.price ?? "");
         });
 
         return next;
       });
     } catch (err) {
-      console.error(
-        "Failed to fetch fishes:",
-        err
-      );
+      console.error("Failed to fetch fishes:", err);
     }
   };
 
@@ -165,9 +144,7 @@ export default function App() {
 
   const fetchKeralaItems = async () => {
     try {
-      const res = await fetch(
-        `${API_URL}/kerala_items`
-      );
+      const res = await fetch(`${API_URL}/kerala_items`);
 
       if (!res.ok) {
         const text = await res.text();
@@ -188,18 +165,13 @@ export default function App() {
         const next = { ...prev };
 
         data.forEach((i) => {
-          next[`item-${i.id}`] = String(
-            i.price ?? ""
-          );
+          next[`item-${i.id}`] = String(i.price ?? "");
         });
 
         return next;
       });
     } catch (err) {
-      console.error(
-        "Failed to fetch Kerala items:",
-        err
-      );
+      console.error("Failed to fetch Kerala items:", err);
     }
   };
 
@@ -213,38 +185,23 @@ export default function App() {
   ========================================================= */
 
   const addFish = async () => {
-    if (
-      !newFish.name.trim() ||
-      newFish.price === ""
-    ) {
-      return;
-    }
+    if (!newFish.name.trim() || newFish.price === "") return;
 
-    const numericPrice = Number(
-      newFish.price
-    );
+    const numericPrice = Number(newFish.price);
 
-    if (
-      !Number.isFinite(numericPrice) ||
-      numericPrice < 0
-    ) {
-      return;
-    }
+    if (!Number.isFinite(numericPrice) || numericPrice < 0) return;
 
     try {
-      const res = await fetch(
-        `${API_URL}/fishes`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: newFish.name.trim(),
-            price: numericPrice,
-          }),
-        }
-      );
+      const res = await fetch(`${API_URL}/fishes`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: newFish.name.trim(),
+          price: numericPrice,
+        }),
+      });
 
       if (!res.ok) {
         const text = await res.text();
@@ -253,8 +210,6 @@ export default function App() {
       }
 
       const addedFish = await res.json();
-
-      setShareFile(null);
 
       setFishes((prev) => [
         ...prev,
@@ -276,10 +231,7 @@ export default function App() {
         price: "",
       });
     } catch (err) {
-      console.error(
-        "Error adding fish:",
-        err
-      );
+      console.error("Error adding fish:", err);
     }
   };
 
@@ -288,38 +240,23 @@ export default function App() {
   ========================================================= */
 
   const addKeralaItem = async () => {
-    if (
-      !newItem.name.trim() ||
-      newItem.price === ""
-    ) {
-      return;
-    }
+    if (!newItem.name.trim() || newItem.price === "") return;
 
-    const numericPrice = Number(
-      newItem.price
-    );
+    const numericPrice = Number(newItem.price);
 
-    if (
-      !Number.isFinite(numericPrice) ||
-      numericPrice < 0
-    ) {
-      return;
-    }
+    if (!Number.isFinite(numericPrice) || numericPrice < 0) return;
 
     try {
-      const res = await fetch(
-        `${API_URL}/kerala_items`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: newItem.name.trim(),
-            price: numericPrice,
-          }),
-        }
-      );
+      const res = await fetch(`${API_URL}/kerala_items`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: newItem.name.trim(),
+          price: numericPrice,
+        }),
+      });
 
       if (!res.ok) {
         const text = await res.text();
@@ -328,8 +265,6 @@ export default function App() {
       }
 
       const addedItem = await res.json();
-
-      setShareFile(null);
 
       setKeralaItems((prev) => [
         ...prev,
@@ -351,10 +286,7 @@ export default function App() {
         price: "",
       });
     } catch (err) {
-      console.error(
-        "Error adding Kerala item:",
-        err
-      );
+      console.error("Error adding Kerala item:", err);
     }
   };
 
@@ -366,39 +298,25 @@ export default function App() {
     if (!confirm("Delete this fish?")) return;
 
     try {
-      const res = await fetch(
-        `${API_URL}/fishes/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const res = await fetch(`${API_URL}/fishes/${id}`, {
+        method: "DELETE",
+      });
 
       if (!res.ok) {
-        throw new Error(
-          "Failed to delete fish"
-        );
+        throw new Error("Failed to delete fish");
       }
 
-      setShareFile(null);
-
       setFishes((prev) =>
-        prev.filter(
-          (f) => f.id !== id
-        )
+        prev.filter((f) => f.id !== id)
       );
 
       setPriceInputs((prev) => {
         const next = { ...prev };
-
         delete next[`fish-${id}`];
-
         return next;
       });
     } catch (err) {
-      console.error(
-        "Error deleting fish:",
-        err
-      );
+      console.error("Error deleting fish:", err);
     }
   };
 
@@ -407,13 +325,7 @@ export default function App() {
   ========================================================= */
 
   const deleteKeralaItem = async (id) => {
-    if (
-      !confirm(
-        "Delete this Kerala item?"
-      )
-    ) {
-      return;
-    }
+    if (!confirm("Delete this Kerala item?")) return;
 
     try {
       const res = await fetch(
@@ -424,31 +336,20 @@ export default function App() {
       );
 
       if (!res.ok) {
-        throw new Error(
-          "Failed to delete Kerala item"
-        );
+        throw new Error("Failed to delete Kerala item");
       }
 
-      setShareFile(null);
-
       setKeralaItems((prev) =>
-        prev.filter(
-          (i) => i.id !== id
-        )
+        prev.filter((i) => i.id !== id)
       );
 
       setPriceInputs((prev) => {
         const next = { ...prev };
-
         delete next[`item-${id}`];
-
         return next;
       });
     } catch (err) {
-      console.error(
-        "Error deleting Kerala item:",
-        err
-      );
+      console.error("Error deleting Kerala item:", err);
     }
   };
 
@@ -456,16 +357,7 @@ export default function App() {
      TOGGLE
   ========================================================= */
 
-  const toggleSelect = (
-    listSetter,
-    list,
-    id
-  ) => {
-    /*
-     * Old image becomes invalid.
-     */
-    setShareFile(null);
-
+  const toggleSelect = (listSetter, list, id) => {
     listSetter(
       list.map((item) =>
         item.id === id
@@ -482,23 +374,16 @@ export default function App() {
      PRICE INPUT
   ========================================================= */
 
-  const handlePriceInput = (
-    type,
-    id,
-    value
-  ) => {
+  const handlePriceInput = (type, id, value) => {
     if (value === "") {
       setPriceInputs((prev) => ({
         ...prev,
         [`${type}-${id}`]: "",
       }));
-
       return;
     }
 
-    if (!/^\d*\.?\d*$/.test(value)) {
-      return;
-    }
+    if (!/^\d*\.?\d*$/.test(value)) return;
 
     setPriceInputs((prev) => ({
       ...prev,
@@ -510,16 +395,11 @@ export default function App() {
      UPDATE PRICE
   ========================================================= */
 
-  const updatePrice = async (
-    type,
-    id
-  ) => {
+  const updatePrice = async (type, id) => {
     const key = `${type}-${id}`;
     const price = priceInputs[key];
 
-    if (!id || price === "") {
-      return;
-    }
+    if (!id || price === "") return;
 
     const numericPrice = Number(price);
 
@@ -529,11 +409,6 @@ export default function App() {
     ) {
       return;
     }
-
-    /*
-     * Immediately invalidate the old poster.
-     */
-    setShareFile(null);
 
     const setter =
       type === "fish"
@@ -561,8 +436,7 @@ export default function App() {
         {
           method: "POST",
           headers: {
-            "Content-Type":
-              "application/json",
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             price: numericPrice,
@@ -572,11 +446,7 @@ export default function App() {
 
       if (!res.ok) {
         const text = await res.text();
-
-        console.error(
-          "Backend error:",
-          text
-        );
+        console.error("Backend error:", text);
       }
     } catch (err) {
       console.error(
@@ -587,162 +457,150 @@ export default function App() {
   };
 
   /* =========================================================
-     PREPARE SHARE IMAGE
-     
-     IMPORTANT:
-     The image is generated BEFORE the user presses Share.
-     This makes navigator.share() much more reliable
-     in production browsers.
-  ========================================================= */
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const prepareShareImage = async () => {
-      if (!listRef.current) {
-        return;
-      }
-
-      try {
-        setIsPreparingShare(true);
-        setShareFile(null);
-
-        /*
-         * Small delay allows React to finish rendering
-         * the latest fish/item changes before html-to-image
-         * captures the poster.
-         */
-        await new Promise((resolve) =>
-          requestAnimationFrame(resolve)
-        );
-
-        const dataUrl =
-          await htmlToImage.toPng(
-            listRef.current,
-            {
-              quality: 1,
-              pixelRatio: 2,
-              cacheBust: true,
-              backgroundColor: "#ffffff",
-            }
-          );
-
-        if (cancelled) {
-          return;
-        }
-
-        const response =
-          await fetch(dataUrl);
-
-        const blob =
-          await response.blob();
-
-        if (cancelled) {
-          return;
-        }
-
-        const file = new File(
-          [blob],
-          "grl-fish-price-list.png",
-          {
-            type: "image/png",
-          }
-        );
-
-        setShareFile(file);
-      } catch (error) {
-        if (!cancelled) {
-          console.error(
-            "Failed to prepare share image:",
-            error
-          );
-
-          setShareFile(null);
-        }
-      } finally {
-        if (!cancelled) {
-          setIsPreparingShare(false);
-        }
-      }
-    };
-
-    prepareShareImage();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [fishes, keralaItems]);
-
-  /* =========================================================
      SHARE PRICE LIST
      
-     No download fallback.
-     No wa.me fallback.
+     MOBILE:
+     - Try native file sharing first.
      
-     The browser's native share sheet handles WhatsApp.
+     DESKTOP / UNSUPPORTED:
+     - Download PNG
+     - Open WhatsApp with text
+     
+     NO ALERTS
   ========================================================= */
 
   const shareToWhatsApp = async () => {
-    if (
-      !shareFile ||
-      isSharing ||
-      isPreparingShare
-    ) {
-      return;
-    }
+    if (!listRef.current || isSharing) return;
 
     try {
       setIsSharing(true);
 
-      /*
-       * Check whether browser supports
-       * sharing files.
-       */
-      const canShareFiles =
-        navigator.share &&
-        navigator.canShare &&
+      /* =====================================================
+         GENERATE PNG
+      ===================================================== */
+
+      const dataUrl =
+        await htmlToImage.toPng(
+          listRef.current,
+          {
+            quality: 1,
+            pixelRatio: 2,
+            cacheBust: true,
+            backgroundColor: "#ffffff",
+          }
+        );
+
+      /* =====================================================
+         CONVERT DATA URL → BLOB
+      ===================================================== */
+
+      const response = await fetch(dataUrl);
+
+      const blob = await response.blob();
+
+      /* =====================================================
+         CREATE FILE
+      ===================================================== */
+
+      const file = new File(
+        [blob],
+        "grl-fish-price-list.png",
+        {
+          type: "image/png",
+        }
+      );
+
+      const shareText =
+        "Today's GRL Fish & Kerala Store price list 🐟🥥";
+
+      /* =====================================================
+         TRY NATIVE FILE SHARE
+         
+         This will work only when the browser supports
+         navigator.share + file sharing.
+
+         We do NOT show an alert if unsupported.
+      ===================================================== */
+
+      const canUseNativeShare =
+        typeof navigator !== "undefined" &&
+        typeof navigator.share === "function" &&
+        typeof navigator.canShare === "function" &&
         navigator.canShare({
-          files: [shareFile],
+          files: [file],
         });
 
-      if (!canShareFiles) {
-        alert(
-          "Image sharing is not supported on this browser. Please use Chrome on Android."
-        );
+      if (canUseNativeShare) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: "GRL Fish & Kerala Store",
+            text: shareText,
+          });
 
-        return;
+          return;
+        } catch (shareError) {
+          /*
+           * User cancelled the native share sheet.
+           * Do nothing.
+           */
+          if (
+            shareError?.name === "AbortError"
+          ) {
+            return;
+          }
+
+          console.warn(
+            "Native file sharing failed:",
+            shareError
+          );
+        }
       }
 
-      /*
-       * IMPORTANT:
-       * This is now the first major operation
-       * performed after clicking the button.
-       */
-      await navigator.share({
-        files: [shareFile],
-        title:
-          "GRL Fish & Kerala Store",
-        text:
-          "Today's fish and Kerala item prices! 🐟🥥",
-      });
-    } catch (error) {
-      /*
-       * User closing/cancelling the share sheet
-       * is not really an error.
-       */
-      if (
-        error?.name !==
-        "AbortError"
-      ) {
-        console.error(
-          "Share failed:",
-          error
-        );
+      /* =====================================================
+         FALLBACK
+         
+         Browser doesn't support native file sharing.
 
-        alert(
-          "Unable to share the price list. Please try again."
-        );
-      }
+         Download the PNG and open WhatsApp with text.
+         
+         WhatsApp URL cannot attach a locally generated
+         image automatically.
+      ===================================================== */
+
+      const link =
+        document.createElement("a");
+
+      link.href = dataUrl;
+
+      link.download =
+        "grl-fish-price-list.png";
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      link.remove();
+
+      /* =====================================================
+         OPEN WHATSAPP
+      ===================================================== */
+
+      const whatsappUrl =
+        `https://wa.me/?text=${encodeURIComponent(
+          shareText
+        )}`;
+
+      window.open(
+        whatsappUrl,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    } catch (err) {
+      console.error(
+        "Error sharing price list:",
+        err
+      );
     } finally {
       setIsSharing(false);
     }
@@ -757,14 +615,8 @@ export default function App() {
       .toLocaleDateString("en-GB")
       .replace(/\//g, "-");
 
-  /* =========================================================
-     SELECTED ITEMS
-  ========================================================= */
-
   const selectedFishes =
-    fishes.filter(
-      (f) => f.selected
-    );
+    fishes.filter((f) => f.selected);
 
   const selectedKeralaItems =
     keralaItems.filter(
@@ -806,8 +658,7 @@ export default function App() {
         minHeight: "100vh",
         background:
           "linear-gradient(180deg,#F4F8FC 0%,#EEF3F8 100%)",
-        padding:
-          "18px 12px 40px",
+        padding: "18px 12px 40px",
         fontFamily:
           '"Inter","Segoe UI",Roboto,Arial,sans-serif',
         color: colors.text,
@@ -893,10 +744,8 @@ export default function App() {
 
         <div
           style={{
-            background:
-              colors.white,
-            border:
-              `1px solid ${colors.border}`,
+            background: colors.white,
+            border: `1px solid ${colors.border}`,
             borderRadius: "20px",
             padding: "16px",
             marginBottom: "14px",
@@ -912,11 +761,7 @@ export default function App() {
               marginBottom: "14px",
             }}
           >
-            <IconBox
-              background={
-                colors.navySoft
-              }
-            >
+            <IconBox background={colors.navySoft}>
               🐟
             </IconBox>
 
@@ -925,8 +770,7 @@ export default function App() {
                 style={{
                   fontSize: "17px",
                   fontWeight: 900,
-                  color:
-                    colors.navy,
+                  color: colors.navy,
                 }}
               >
                 Add Fish
@@ -935,8 +779,7 @@ export default function App() {
               <div
                 style={{
                   fontSize: "12px",
-                  color:
-                    colors.muted,
+                  color: colors.muted,
                   marginTop: "2px",
                 }}
               >
@@ -960,8 +803,7 @@ export default function App() {
               onChange={(e) =>
                 setNewFish({
                   ...newFish,
-                  name:
-                    e.target.value,
+                  name: e.target.value,
                 })
               }
               style={{
@@ -970,12 +812,10 @@ export default function App() {
                 border:
                   "1px solid #CBD6E2",
                 borderRadius: "13px",
-                padding:
-                  "0 13px",
+                padding: "0 13px",
                 fontSize: "15px",
                 outline: "none",
-                background:
-                  "#FBFCFE",
+                background: "#FBFCFE",
               }}
             />
 
@@ -983,9 +823,7 @@ export default function App() {
               type="text"
               inputMode="decimal"
               placeholder="Price ₹"
-              value={
-                newFish.price
-              }
+              value={newFish.price}
               onChange={(e) => {
                 const value =
                   e.target.value;
@@ -1007,13 +845,11 @@ export default function App() {
                 border:
                   "1px solid #CBD6E2",
                 borderRadius: "13px",
-                padding:
-                  "0 12px",
+                padding: "0 12px",
                 fontSize: "15px",
                 fontWeight: 700,
                 outline: "none",
-                background:
-                  "#FBFCFE",
+                background: "#FBFCFE",
               }}
             />
 
@@ -1022,8 +858,7 @@ export default function App() {
               style={{
                 border: "none",
                 borderRadius: "13px",
-                background:
-                  colors.green,
+                background: colors.green,
                 color: "white",
                 fontSize: "22px",
                 fontWeight: 900,
@@ -1041,10 +876,8 @@ export default function App() {
 
         <div
           style={{
-            background:
-              colors.white,
-            border:
-              `1px solid ${colors.border}`,
+            background: colors.white,
+            border: `1px solid ${colors.border}`,
             borderRadius: "20px",
             padding: "16px",
             marginBottom: "18px",
@@ -1060,11 +893,7 @@ export default function App() {
               marginBottom: "14px",
             }}
           >
-            <IconBox
-              background={
-                colors.greenSoft
-              }
-            >
+            <IconBox background={colors.greenSoft}>
               🥥
             </IconBox>
 
@@ -1073,8 +902,7 @@ export default function App() {
                 style={{
                   fontSize: "17px",
                   fontWeight: 900,
-                  color:
-                    colors.green,
+                  color: colors.green,
                 }}
               >
                 Add Kerala Item
@@ -1083,8 +911,7 @@ export default function App() {
               <div
                 style={{
                   fontSize: "12px",
-                  color:
-                    colors.muted,
+                  color: colors.muted,
                   marginTop: "2px",
                 }}
               >
@@ -1108,8 +935,7 @@ export default function App() {
               onChange={(e) =>
                 setNewItem({
                   ...newItem,
-                  name:
-                    e.target.value,
+                  name: e.target.value,
                 })
               }
               style={{
@@ -1118,12 +944,10 @@ export default function App() {
                 border:
                   "1px solid #CBD6E2",
                 borderRadius: "13px",
-                padding:
-                  "0 13px",
+                padding: "0 13px",
                 fontSize: "15px",
                 outline: "none",
-                background:
-                  "#FBFCFE",
+                background: "#FBFCFE",
               }}
             />
 
@@ -1131,9 +955,7 @@ export default function App() {
               type="text"
               inputMode="decimal"
               placeholder="Price ₹"
-              value={
-                newItem.price
-              }
+              value={newItem.price}
               onChange={(e) => {
                 const value =
                   e.target.value;
@@ -1155,25 +977,20 @@ export default function App() {
                 border:
                   "1px solid #CBD6E2",
                 borderRadius: "13px",
-                padding:
-                  "0 12px",
+                padding: "0 12px",
                 fontSize: "15px",
                 fontWeight: 700,
                 outline: "none",
-                background:
-                  "#FBFCFE",
+                background: "#FBFCFE",
               }}
             />
 
             <button
-              onClick={
-                addKeralaItem
-              }
+              onClick={addKeralaItem}
               style={{
                 border: "none",
                 borderRadius: "13px",
-                background:
-                  colors.green,
+                background: colors.green,
                 color: "white",
                 fontSize: "22px",
                 fontWeight: 900,
@@ -1197,8 +1014,7 @@ export default function App() {
           <div
             style={{
               display: "flex",
-              justifyContent:
-                "space-between",
+              justifyContent: "space-between",
               alignItems: "center",
               marginBottom: "10px",
               padding: "0 3px",
@@ -1208,8 +1024,7 @@ export default function App() {
               style={{
                 fontSize: "17px",
                 fontWeight: 900,
-                color:
-                  colors.navy,
+                color: colors.navy,
               }}
             >
               Today's Fish
@@ -1219,8 +1034,7 @@ export default function App() {
               style={{
                 fontSize: "12px",
                 fontWeight: 800,
-                color:
-                  colors.muted,
+                color: colors.muted,
               }}
             >
               {fishes.length} items
@@ -1230,8 +1044,7 @@ export default function App() {
           <div
             style={{
               display: "flex",
-              flexDirection:
-                "column",
+              flexDirection: "column",
               gap: "8px",
             }}
           >
@@ -1239,21 +1052,18 @@ export default function App() {
               <div
                 key={f.id}
                 style={{
-                  background:
+                  background: f.selected
+                    ? "#F4FAF5"
+                    : "#FFFFFF",
+                  border: `1px solid ${
                     f.selected
-                      ? "#F4FAF5"
-                      : "#FFFFFF",
-                  border:
-                    `1px solid ${
-                      f.selected
-                        ? "#C9E3CD"
-                        : colors.border
-                    }`,
+                      ? "#C9E3CD"
+                      : colors.border
+                  }`,
                   borderRadius: "16px",
                   padding: "10px",
                   display: "flex",
-                  alignItems:
-                    "center",
+                  alignItems: "center",
                   gap: "10px",
                 }}
               >
@@ -1267,10 +1077,8 @@ export default function App() {
                     style={{
                       fontWeight: 800,
                       fontSize: "14px",
-                      color:
-                        colors.text,
-                      overflow:
-                        "hidden",
+                      color: colors.text,
+                      overflow: "hidden",
                       textOverflow:
                         "ellipsis",
                       whiteSpace:
@@ -1283,8 +1091,7 @@ export default function App() {
                   <div
                     style={{
                       fontSize: "11px",
-                      color:
-                        colors.muted,
+                      color: colors.muted,
                       marginTop: "2px",
                     }}
                   >
@@ -1318,16 +1125,13 @@ export default function App() {
                     height: "40px",
                     border:
                       "1px solid #C9D5E1",
-                    borderRadius:
-                      "11px",
+                    borderRadius: "11px",
                     padding:
                       "0 9px",
                     fontWeight: 800,
                     fontSize: "14px",
-                    textAlign:
-                      "right",
-                    outline:
-                      "none",
+                    textAlign: "right",
+                    outline: "none",
                   }}
                 />
 
@@ -1344,8 +1148,7 @@ export default function App() {
                     width: "40px",
                     height: "40px",
                     border: "none",
-                    borderRadius:
-                      "11px",
+                    borderRadius: "11px",
                     background:
                       f.selected
                         ? colors.green
@@ -1355,35 +1158,28 @@ export default function App() {
                         ? "#fff"
                         : colors.muted,
                     fontSize: "17px",
-                    cursor:
-                      "pointer",
+                    cursor: "pointer",
                   }}
                 >
-                  {f.selected
-                    ? "✓"
-                    : "+"}
+                  {f.selected ? "✓" : "+"}
                 </button>
 
                 <button
                   onClick={() =>
-                    deleteFish(
-                      f.id
-                    )
+                    deleteFish(f.id)
                   }
                   aria-label="Delete fish"
                   style={{
                     width: "40px",
                     height: "40px",
                     border: "none",
-                    borderRadius:
-                      "11px",
+                    borderRadius: "11px",
                     background:
                       "#FFF0F0",
                     color:
                       colors.danger,
                     fontSize: "16px",
-                    cursor:
-                      "pointer",
+                    cursor: "pointer",
                   }}
                 >
                   ×
@@ -1405,8 +1201,7 @@ export default function App() {
           <div
             style={{
               display: "flex",
-              justifyContent:
-                "space-between",
+              justifyContent: "space-between",
               alignItems: "center",
               marginBottom: "10px",
               padding: "0 3px",
@@ -1416,8 +1211,7 @@ export default function App() {
               style={{
                 fontSize: "17px",
                 fontWeight: 900,
-                color:
-                  colors.green,
+                color: colors.green,
               }}
             >
               Kerala Items
@@ -1427,8 +1221,7 @@ export default function App() {
               style={{
                 fontSize: "12px",
                 fontWeight: 800,
-                color:
-                  colors.muted,
+                color: colors.muted,
               }}
             >
               {keralaItems.length} items
@@ -1438,8 +1231,7 @@ export default function App() {
           <div
             style={{
               display: "flex",
-              flexDirection:
-                "column",
+              flexDirection: "column",
               gap: "8px",
             }}
           >
@@ -1447,21 +1239,18 @@ export default function App() {
               <div
                 key={i.id}
                 style={{
-                  background:
+                  background: i.selected
+                    ? "#F5FAF5"
+                    : "#FFFFFF",
+                  border: `1px solid ${
                     i.selected
-                      ? "#F5FAF5"
-                      : "#FFFFFF",
-                  border:
-                    `1px solid ${
-                      i.selected
-                        ? "#C9E3CD"
-                        : colors.border
-                    }`,
+                      ? "#C9E3CD"
+                      : colors.border
+                  }`,
                   borderRadius: "16px",
                   padding: "10px",
                   display: "flex",
-                  alignItems:
-                    "center",
+                  alignItems: "center",
                   gap: "10px",
                 }}
               >
@@ -1475,10 +1264,8 @@ export default function App() {
                     style={{
                       fontWeight: 800,
                       fontSize: "14px",
-                      color:
-                        colors.text,
-                      overflow:
-                        "hidden",
+                      color: colors.text,
+                      overflow: "hidden",
                       textOverflow:
                         "ellipsis",
                       whiteSpace:
@@ -1491,8 +1278,7 @@ export default function App() {
                   <div
                     style={{
                       fontSize: "11px",
-                      color:
-                        colors.muted,
+                      color: colors.muted,
                       marginTop: "2px",
                     }}
                   >
@@ -1526,16 +1312,13 @@ export default function App() {
                     height: "40px",
                     border:
                       "1px solid #C9D5E1",
-                    borderRadius:
-                      "11px",
+                    borderRadius: "11px",
                     padding:
                       "0 9px",
                     fontWeight: 800,
                     fontSize: "14px",
-                    textAlign:
-                      "right",
-                    outline:
-                      "none",
+                    textAlign: "right",
+                    outline: "none",
                   }}
                 />
 
@@ -1552,8 +1335,7 @@ export default function App() {
                     width: "40px",
                     height: "40px",
                     border: "none",
-                    borderRadius:
-                      "11px",
+                    borderRadius: "11px",
                     background:
                       i.selected
                         ? colors.green
@@ -1563,13 +1345,10 @@ export default function App() {
                         ? "#fff"
                         : colors.muted,
                     fontSize: "17px",
-                    cursor:
-                      "pointer",
+                    cursor: "pointer",
                   }}
                 >
-                  {i.selected
-                    ? "✓"
-                    : "+"}
+                  {i.selected ? "✓" : "+"}
                 </button>
 
                 <button
@@ -1583,15 +1362,13 @@ export default function App() {
                     width: "40px",
                     height: "40px",
                     border: "none",
-                    borderRadius:
-                      "11px",
+                    borderRadius: "11px",
                     background:
                       "#FFF0F0",
                     color:
                       colors.danger,
                     fontSize: "16px",
-                    cursor:
-                      "pointer",
+                    cursor: "pointer",
                   }}
                 >
                   ×
@@ -1603,8 +1380,6 @@ export default function App() {
 
         {/* =================================================
             POSTER
-            720 × 960 CSS
-            2x export = 1440 × 1920
         ================================================= */}
 
         <div
@@ -1623,16 +1398,13 @@ export default function App() {
               width: "720px",
               height: "960px",
               padding: "18px",
-              boxSizing:
-                "border-box",
+              boxSizing: "border-box",
               background:
                 "linear-gradient(180deg,#FFFFFF 0%,#F7FAFD 100%)",
-              color:
-                colors.text,
+              color: colors.text,
               fontFamily:
                 '"Segoe UI","Trebuchet MS",Arial,sans-serif',
-              position:
-                "relative",
+              position: "relative",
               overflow: "hidden",
               border:
                 "2px solid #C39A45",
@@ -1646,12 +1418,10 @@ export default function App() {
                   "1px solid #173B6D",
                 height: "100%",
                 padding: "15px",
-                boxSizing:
-                  "border-box",
+                boxSizing: "border-box",
                 background:
                   "linear-gradient(180deg,#FFFFFF 0%,#F8FBFF 100%)",
-                position:
-                  "relative",
+                position: "relative",
               }}
             >
 
@@ -1659,14 +1429,12 @@ export default function App() {
 
               <div
                 style={{
-                  textAlign:
-                    "center",
+                  textAlign: "center",
                 }}
               >
                 <div
                   style={{
-                    display:
-                      "flex",
+                    display: "flex",
                     justifyContent:
                       "center",
                     alignItems:
@@ -1878,7 +1646,7 @@ export default function App() {
                         "15px",
                     }}
                   >
-                    🐟
+                    ≋
                   </span>
 
                   <span>
@@ -1927,7 +1695,7 @@ export default function App() {
                         "15px",
                     }}
                   >
-                    🥥
+                    ◉
                   </span>
 
                   <span>
@@ -1996,9 +1764,7 @@ export default function App() {
                     {selectedFishes.map(
                       (f, idx) => (
                         <tr
-                          key={
-                            f.id
-                          }
+                          key={f.id}
                         >
                           <td
                             style={
@@ -2083,9 +1849,7 @@ export default function App() {
                       {selectedKeralaItems.map(
                         (i, idx) => (
                           <tr
-                            key={
-                              i.id
-                            }
+                            key={i.id}
                           >
                             <td
                               style={
@@ -2362,26 +2126,17 @@ export default function App() {
         ================================================= */}
 
         <button
-          onClick={
-            shareToWhatsApp
-          }
-          disabled={
-            isSharing ||
-            isPreparingShare ||
-            !shareFile
-          }
+          onClick={shareToWhatsApp}
+          disabled={isSharing}
           style={{
             width: "100%",
             height: "56px",
             marginTop: "18px",
             border: "none",
             borderRadius: "17px",
-            background:
-              isSharing ||
-              isPreparingShare ||
-              !shareFile
-                ? "#7A8795"
-                : "linear-gradient(135deg,#25D366,#159447)",
+            background: isSharing
+              ? "#7A8795"
+              : "linear-gradient(135deg,#25D366,#159447)",
             color: "#FFFFFF",
             fontSize: "16px",
             fontWeight: 900,
@@ -2389,33 +2144,23 @@ export default function App() {
               "0.2px",
             boxShadow:
               "0 10px 25px rgba(37,211,102,.22)",
-            cursor:
-              isSharing ||
-              isPreparingShare ||
-              !shareFile
-                ? "not-allowed"
-                : "pointer",
+            cursor: isSharing
+              ? "not-allowed"
+              : "pointer",
           }}
         >
           {isSharing
-            ? "Opening WhatsApp..."
-            : isPreparingShare ||
-              !shareFile
             ? "Preparing price list..."
             : "Share Price List to WhatsApp"}
         </button>
 
         <div
           style={{
-            textAlign:
-              "center",
-            color:
-              colors.muted,
-            fontSize:
-              "11px",
+            textAlign: "center",
+            color: colors.muted,
+            fontSize: "11px",
             fontWeight: 600,
-            marginTop:
-              "9px",
+            marginTop: "9px",
           }}
         >
           High-resolution image • Optimized for WhatsApp
