@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import * as htmlToImage from "html-to-image";
+import OfferCreator from "./components/OfferCreator";
 
 /* =========================================================
    DESIGN SYSTEM
@@ -2165,6 +2166,7 @@ export default function App() {
         >
           High-resolution image • Optimized for WhatsApp
         </div>
+        <OfferCreator />
       </div>
     </div>
   );
