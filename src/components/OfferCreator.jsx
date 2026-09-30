@@ -250,16 +250,9 @@ const OfferCreator = () => {
               )}
             </div>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns:
-                  "minmax(180px, 2fr) minmax(130px, 1fr) minmax(130px, 1fr)",
-                gap: "12px",
-              }}
-            >
+            <div className="offer-product-fields">
               {/* Product name */}
-              <input
+              <input    
                 type="text"
                 placeholder="Product name"
                 value={product.name}
