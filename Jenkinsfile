@@ -96,6 +96,18 @@ pipeline {
         //         }
         //     }
         // }
+        stage('Verify Backend Image') {
+            steps {
+                withCredentials([
+                    [$class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'github-ecr-user']
+                ]) {
+                    bat '''
+                        aws ecr describe-images --repository-name fishprice-backend --region ap-southeast-2 --output table
+                    '''
+                }
+            }
+        }
     }
 
     post {
