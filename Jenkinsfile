@@ -15,7 +15,7 @@ pipeline {
         FRONTEND_IMAGE = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${FRONTEND_REPO}"
 
 
-        EC2_HOST = '15.135.81.128'
+        EC2_HOST = '3.104.105.172'
         EC2_USER = 'ubuntu'
     }
 
