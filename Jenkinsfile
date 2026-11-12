@@ -1,10 +1,11 @@
+
 pipeline {
 
     agent any
 
     environment {
-        AWS_REGION = 'us-east-1'
-        AWS_ACCOUNT_ID = '864241680365'
+        AWS_REGION = 'ap-southeast-2'
+        AWS_ACCOUNT_ID = '262726858927'
 
         BACKEND_REPO = 'fishprice-backend'
         FRONTEND_REPO = 'fishprice-frontend'
@@ -14,7 +15,7 @@ pipeline {
 
         IMAGE_TAG = "${BUILD_NUMBER}"
 
-        EC2_HOST = '54.167.192.77'
+        EC2_HOST = '15.135.81.128'
         EC2_USER = 'ubuntu'
     }
 
@@ -41,6 +42,7 @@ pipeline {
                 '''
             }
         }
+
         stage('Login to ECR') {
             steps {
                 withCredentials([
@@ -89,7 +91,7 @@ pipeline {
 
                         echo Deploying to EC2...
 
-                        ssh -i "%EC2_KEY%" -o StrictHostKeyChecking=no ubuntu@%EC2_HOST% "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 864241680365.dkr.ecr.us-east-1.amazonaws.com && cd /home/ubuntu/fishprice && sed -i 's/^IMAGE_TAG=.*/IMAGE_TAG=%IMAGE_TAG%/' .env.deploy && docker compose --env-file .env.deploy pull && docker compose --env-file .env.deploy up -d
+                        ssh -i "%EC2_KEY%" -o StrictHostKeyChecking=no ubuntu@%EC2_HOST% "aws ecr get-login-password --region %AWS_REGION% | docker login --username AWS --password-stdin %AWS_ACCOUNT_ID%.dkr.ecr.%AWS_REGION%.amazonaws.com && cd /home/ubuntu/fishprice && sed -i 's/^IMAGE_TAG=.*/IMAGE_TAG=%IMAGE_TAG%/' .env.deploy && docker compose --env-file .env.deploy -f docker-compose.yml pull && docker compose --env-file .env.deploy -f docker-compose.yml up -d"
                     '''
                 }
             }
