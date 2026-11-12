@@ -74,28 +74,28 @@ pipeline {
             }
         }
 
-        stage('Deploy to EC2') {
-            steps {
-                withCredentials([
-                    file(
-                        credentialsId: 'ec2-pem',
-                        variable: 'EC2_KEY'
-                    )
-                ]) {
-                    bat '''
-                        echo Fixing SSH key permissions...
+        // stage('Deploy to EC2') {
+        //     steps {
+        //         withCredentials([
+        //             file(
+        //                 credentialsId: 'ec2-pem',
+        //                 variable: 'EC2_KEY'
+        //             )
+        //         ]) {
+        //             bat '''
+        //                 echo Fixing SSH key permissions...
 
-                        icacls "%EC2_KEY%" /inheritance:r
-                        icacls "%EC2_KEY%" /grant:r "SYSTEM:F"
-                        icacls "%EC2_KEY%" /grant:r "Administrators:F"
+        //                 icacls "%EC2_KEY%" /inheritance:r
+        //                 icacls "%EC2_KEY%" /grant:r "SYSTEM:F"
+        //                 icacls "%EC2_KEY%" /grant:r "Administrators:F"
 
-                        echo Deploying to EC2...
+        //                 echo Deploying to EC2...
 
-                        ssh -i "%EC2_KEY%" -o StrictHostKeyChecking=no ubuntu@%EC2_HOST% "aws ecr get-login-password --region %AWS_REGION% | docker login --username AWS --password-stdin %AWS_ACCOUNT_ID%.dkr.ecr.%AWS_REGION%.amazonaws.com && cd /home/ubuntu/fishprice && sed -i 's/^IMAGE_TAG=.*/IMAGE_TAG=%IMAGE_TAG%/' .env.deploy && docker compose --env-file .env.deploy -f docker-compose.yml pull && docker compose --env-file .env.deploy -f docker-compose.yml up -d"
-                    '''
-                }
-            }
-        }
+        //                 ssh -i "%EC2_KEY%" -o StrictHostKeyChecking=no ubuntu@%EC2_HOST% "aws ecr get-login-password --region %AWS_REGION% | docker login --username AWS --password-stdin %AWS_ACCOUNT_ID%.dkr.ecr.%AWS_REGION%.amazonaws.com && cd /home/ubuntu/fishprice && sed -i 's/^IMAGE_TAG=.*/IMAGE_TAG=%IMAGE_TAG%/' .env.deploy && docker compose --env-file .env.deploy -f docker-compose.yml pull && docker compose --env-file .env.deploy -f docker-compose.yml up -d"
+        //             '''
+        //         }
+        //     }
+        // }
     }
 
     post {
