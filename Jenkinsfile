@@ -6,6 +6,7 @@ pipeline {
     environment {
         AWS_REGION = 'ap-southeast-2'
         AWS_ACCOUNT_ID = '262726858927'
+        IMAGE_TAG = "${BUILD_NUMBER}"
 
         BACKEND_REPO = 'fishprice-backend'
         FRONTEND_REPO = 'fishprice-frontend'
@@ -13,7 +14,6 @@ pipeline {
         BACKEND_IMAGE = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BACKEND_REPO}"
         FRONTEND_IMAGE = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${FRONTEND_REPO}"
 
-        IMAGE_TAG = "${BUILD_NUMBER}"
 
         EC2_HOST = '15.135.81.128'
         EC2_USER = 'ubuntu'
@@ -74,40 +74,29 @@ pipeline {
             }
         }
 
-        // stage('Deploy to EC2') {
-        //     steps {
-        //         withCredentials([
-        //             file(
-        //                 credentialsId: 'ec2-pem',
-        //                 variable: 'EC2_KEY'
-        //             )
-        //         ]) {
-        //             bat '''
-        //                 echo Fixing SSH key permissions...
-
-        //                 icacls "%EC2_KEY%" /inheritance:r
-        //                 icacls "%EC2_KEY%" /grant:r "SYSTEM:F"
-        //                 icacls "%EC2_KEY%" /grant:r "Administrators:F"
-
-        //                 echo Deploying to EC2...
-
-        //                 ssh -i "%EC2_KEY%" -o StrictHostKeyChecking=no ubuntu@%EC2_HOST% "aws ecr get-login-password --region %AWS_REGION% | docker login --username AWS --password-stdin %AWS_ACCOUNT_ID%.dkr.ecr.%AWS_REGION%.amazonaws.com && cd /home/ubuntu/fishprice && sed -i 's/^IMAGE_TAG=.*/IMAGE_TAG=%IMAGE_TAG%/' .env.deploy && docker compose --env-file .env.deploy -f docker-compose.yml pull && docker compose --env-file .env.deploy -f docker-compose.yml up -d"
-        //             '''
-        //         }
-        //     }
-        // }
-        stage('Verify Backend Image') {
+        stage('Deploy to EC2') {
             steps {
                 withCredentials([
-                    [$class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'github-ecr-user']
+                    file(
+                        credentialsId: 'ec2-pem',
+                        variable: 'EC2_KEY'
+                    )
                 ]) {
                     bat '''
-                        aws ecr describe-images --repository-name fishprice-backend --region ap-southeast-2 --output table
+                        echo Fixing SSH key permissions...
+
+                        icacls "%EC2_KEY%" /inheritance:r
+                        icacls "%EC2_KEY%" /grant:r "SYSTEM:F"
+                        icacls "%EC2_KEY%" /grant:r "Administrators:F"
+
+                        echo Deploying to EC2...
+
+                        ssh -i "%EC2_KEY%" -o StrictHostKeyChecking=no ubuntu@%EC2_HOST% "aws ecr get-login-password --region %AWS_REGION% | docker login --username AWS --password-stdin %AWS_ACCOUNT_ID%.dkr.ecr.%AWS_REGION%.amazonaws.com && cd /home/ubuntu/fishprice && sed -i 's/^IMAGE_TAG=.*/IMAGE_TAG=%IMAGE_TAG%/' .env.deploy && docker compose --env-file .env.deploy -f docker-compose.yml pull && docker compose --env-file .env.deploy -f docker-compose.yml up -d"
                     '''
                 }
             }
         }
+
     }
 
     post {
